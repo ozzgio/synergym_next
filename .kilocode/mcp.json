@@ -1,0 +1,23 @@
+{
+    "mcpServers": {
+        "context7": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@upstash/context7-mcp"
+            ],
+            "env": {
+                "DEFAULT_MINIMUM_TOKENS": ""
+            }
+        },
+        "playwright": {
+            "command": "npx",
+            "args": [
+                "@playwright/mcp"
+            ],
+            "env": {
+                "PLAYWRIGHT_BROWSERS_PATH": "0"
+            }
+        }
+    }
+}

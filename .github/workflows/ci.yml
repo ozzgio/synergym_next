@@ -1,0 +1,219 @@
+name: Continuous Integration
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: "Lint"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v5
+      - name: "Setup Ruby"
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+      - name: "Run RuboCop"
+        run: bundle exec rubocop
+
+  test:
+    name: "Test"
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: synergym_test
+          POSTGRES_USER: postgres
+          POSTGRES_HOST_AUTH_METHOD: trust
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v5
+      - name: "Setup Ruby"
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+      - name: "Setup Node.js"
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "yarn"
+      - name: "Install frontend dependencies"
+        run: yarn install --frozen-lockfile
+      - name: "Setup database"
+        env:
+          RAILS_ENV: test
+          DATABASE_URL: "postgres://postgres@localhost:5432/synergym_test"
+        run: |
+          bundle exec rails db:test:prepare
+      - name: "Run tests"
+        env:
+          RAILS_ENV: test
+          DATABASE_URL: "postgres://postgres@localhost:5432/synergym_test"
+          COVERAGE: "true"
+        run: |
+          bundle exec rails test
+      - name: "Check coverage percentage"
+        run: |
+          # Debug: List coverage directory contents
+          echo "=== Coverage directory debug ==="
+          ls -la coverage/ || echo "No coverage directory found"
+          
+          # Debug: Check if coverage.xml exists and show first few lines
+          if [ -f "coverage/coverage.xml" ]; then
+            echo "=== Coverage.xml found, showing first 20 lines ==="
+            head -20 coverage/coverage.xml
+            echo "=== End of coverage.xml preview ==="
+          else
+            echo "=== No coverage.xml found ==="
+            echo "Available files in coverage/:"
+            ls -la coverage/ || echo "No coverage directory"
+          fi
+          
+          # Extract coverage percentage from SimpleCov output
+          if [ -f "coverage/coverage.xml" ]; then
+            COVERAGE_PERCENT=$(grep -o 'line-rate="[0-9.]*"' coverage/coverage.xml | sed 's/line-rate="//' | sed 's/"//' | awk '{printf "%.0f", $1 * 100}' || echo "0")
+            echo "Coverage: ${COVERAGE_PERCENT}%"
+            
+            # Check if coverage meets minimum threshold (80%)
+            THRESHOLD=80
+            if (( $(echo "${COVERAGE_PERCENT} < ${THRESHOLD}" | bc -l) )); then
+              echo "❌ Coverage ${COVERAGE_PERCENT}% is below threshold ${THRESHOLD}%"
+              exit 1
+            else
+              echo "✅ Coverage ${COVERAGE_PERCENT}% meets threshold ${THRESHOLD}%"
+            fi
+          else
+            echo "❌ No coverage report found"
+            exit 1
+          fi
+      - name: "Upload coverage reports"
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports
+          path: coverage/
+
+  security:
+    name: "Security"
+    runs-on: ubuntu-latest
+    needs: [lint]
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: "Setup Ruby"
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+      - name: "Setup Node.js"
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "yarn"
+      - name: "Install frontend dependencies"
+        run: yarn install --frozen-lockfile
+      - name: "Audit Ruby dependencies"
+        run: |
+          gem install bundler-audit
+          bundle audit check --update
+      - name: "Audit JavaScript dependencies"
+        run: yarn audit --severity moderate
+      - name: "Run Brakeman"
+        run: |
+          bundle exec brakeman --no-pager --exit-on-warn --format sarif > brakeman-report.sarif
+      - name: "Upload Brakeman report"
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: brakeman-report.sarif
+        if: false
+      - name: "Scan for secrets"
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          head: ${{ github.sha }}
+          extra_args: --only-verified --no-update
+        continue-on-error: true
+      - name: "Debug TruffleHog results"
+        run: |
+          echo "=== TruffleHog Debug Info ==="
+          echo "Event name: ${{ github.event_name }}"
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            echo "Base SHA: ${{ github.event.pull_request.base.sha }}"
+          else
+            echo "Base SHA: ${{ github.event.before }}"
+          fi
+          echo "Head SHA: ${{ github.sha }}"
+          echo "=== End TruffleHog Debug ==="
+
+  validate:
+    name: "Validate"
+    runs-on: ubuntu-latest
+    needs: [test, security]
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: "Validate VERSION file"
+        run: |
+          if [[ ! -f "VERSION" ]]; then
+            echo "VERSION file not found"
+            exit 1
+          fi
+          if ! grep -qE "^[0-9]+\.[0-9]+\.[0-9]+$" VERSION; then
+            echo "Invalid VERSION format"
+            exit 1
+          fi
+      - name: "Validate CHANGELOG"
+        run: |
+          if [[ ! -f "CHANGELOG.md" ]]; then
+            echo "CHANGELOG.md not found"
+            exit 1
+          fi
+          if ! grep -qE "^# Changelog" CHANGELOG.md; then
+            echo "CHANGELOG.md missing main heading"
+            exit 1
+          fi
+          if ! grep -qE "^## \\[Unreleased\\]" CHANGELOG.md; then
+            echo "CHANGELOG.md missing [Unreleased] section"
+            exit 1
+          fi
+          VERSION=$(cat VERSION)
+          if ! grep -qE "^## \\[$VERSION\\] - [0-9]{4}-[0-9]{2}-[0-9]{2}" CHANGELOG.md; then
+            echo "CHANGELOG.md missing entry for version $VERSION"
+            exit 1
+          fi
+      - name: "Validate commit messages"
+        run: |
+          git fetch origin main
+          COMMITS=$(git rev-list origin/main..HEAD)
+          for COMMIT in $COMMITS; do
+            MESSAGE=$(git log -1 --pretty=format:%s $COMMIT)
+            if ! echo "$MESSAGE" | grep -qE "^(feat|fix|docs|style|refactor|perf|test|chore)(\(.+\))?: .{1,50}"; then
+              echo "Invalid commit message format: $MESSAGE"
+              exit 1
+            fi
+          done
