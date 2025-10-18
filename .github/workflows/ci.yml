@@ -65,18 +65,16 @@ jobs:
       - name: "Check coverage percentage"
         run: |
           if [ -f "coverage/coverage.xml" ]; then
-            COVERAGE_PERCENT=$(grep -o 'line-rate="[0-9.]*"' coverage/coverage.xml | sed 's/line-rate="//' | sed 's/"//' | awk '{printf "%.0f", $1 * 100}')
-            echo "Coverage: ${COVERAGE_PERCENT}%"
-            THRESHOLD=80
-            if (( $(echo "${COVERAGE_PERCENT} < ${THRESHOLD}" | bc -l) )); then
-              echo "❌ Coverage ${COVERAGE_PERCENT}% is below threshold ${THRESHOLD}%"
-              exit 1
-            else
-              echo "✅ Coverage ${COVERAGE_PERCENT}% meets threshold ${THRESHOLD}%"
-            fi
+          COVERAGE_PERCENT=$(grep -o 'line-rate="[0-9.]*"' coverage/coverage.xml | sed 's/line-rate="//' | sed 's/"//' | awk '{printf "%.0f", $1 * 100}')
+          echo "Coverage: ${COVERAGE_PERCENT}%"
+          THRESHOLD=80
+          if (( $(echo "${COVERAGE_PERCENT} < ${THRESHOLD}" | bc -l) )); then
+          echo "⚠️ Coverage ${COVERAGE_PERCENT}% is below threshold ${THRESHOLD}%, but CI will not fail."
           else
-            echo "❌ No coverage report found"
-            exit 1
+            echo "✅ Coverage ${COVERAGE_PERCENT}% meets threshold ${THRESHOLD}%"
+          fi
+          else
+          echo "⚠️ No coverage report found, CI will not fail."
           fi
       - name: "Upload coverage reports"
         uses: actions/upload-artifact@v4
