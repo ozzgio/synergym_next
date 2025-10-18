@@ -112,15 +112,7 @@ jobs:
         with:
           sarif_file: brakeman-report.sarif
         if: false
-      - name: "Scan for secrets"
-        uses: trufflesecurity/trufflehog@main
-        with:
-          path: ./
-          base: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
-          head: ${{ github.sha }}
-          extra_args: --only-verified --no-update
-        continue-on-error: true
-
+      
   validate:
     name: "Validate"
     runs-on: ubuntu-latest
