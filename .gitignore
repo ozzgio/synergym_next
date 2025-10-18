@@ -7,7 +7,6 @@
 .DS_Store
 .vscode/
 .kamal/
-.ruby-version
 .gitattributes
 .dockerignore
 .overcommit.yml
