@@ -49,13 +49,6 @@ jobs:
         with:
           ruby-version: .ruby-version
           bundler-cache: true
-      - name: "Setup Node.js"
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "yarn"
-      - name: "Install frontend dependencies"
-        run: yarn install --frozen-lockfile
       - name: "Setup database"
         env:
           RAILS_ENV: test
@@ -71,27 +64,9 @@ jobs:
           bundle exec rails test
       - name: "Check coverage percentage"
         run: |
-          # Debug: List coverage directory contents
-          echo "=== Coverage directory debug ==="
-          ls -la coverage/ || echo "No coverage directory found"
-          
-          # Debug: Check if coverage.xml exists and show first few lines
           if [ -f "coverage/coverage.xml" ]; then
-            echo "=== Coverage.xml found, showing first 20 lines ==="
-            head -20 coverage/coverage.xml
-            echo "=== End of coverage.xml preview ==="
-          else
-            echo "=== No coverage.xml found ==="
-            echo "Available files in coverage/:"
-            ls -la coverage/ || echo "No coverage directory"
-          fi
-          
-          # Extract coverage percentage from SimpleCov output
-          if [ -f "coverage/coverage.xml" ]; then
-            COVERAGE_PERCENT=$(grep -o 'line-rate="[0-9.]*"' coverage/coverage.xml | sed 's/line-rate="//' | sed 's/"//' | awk '{printf "%.0f", $1 * 100}' || echo "0")
+            COVERAGE_PERCENT=$(grep -o 'line-rate="[0-9.]*"' coverage/coverage.xml | sed 's/line-rate="//' | sed 's/"//' | awk '{printf "%.0f", $1 * 100}')
             echo "Coverage: ${COVERAGE_PERCENT}%"
-            
-            # Check if coverage meets minimum threshold (80%)
             THRESHOLD=80
             if (( $(echo "${COVERAGE_PERCENT} < ${THRESHOLD}" | bc -l) )); then
               echo "❌ Coverage ${COVERAGE_PERCENT}% is below threshold ${THRESHOLD}%"
@@ -127,19 +102,10 @@ jobs:
         with:
           ruby-version: .ruby-version
           bundler-cache: true
-      - name: "Setup Node.js"
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "yarn"
-      - name: "Install frontend dependencies"
-        run: yarn install --frozen-lockfile
       - name: "Audit Ruby dependencies"
         run: |
           gem install bundler-audit
           bundle audit check --update
-      - name: "Audit JavaScript dependencies"
-        run: yarn audit --severity moderate
       - name: "Run Brakeman"
         run: |
           bundle exec brakeman --no-pager --exit-on-warn --format sarif > brakeman-report.sarif
@@ -156,17 +122,6 @@ jobs:
           head: ${{ github.sha }}
           extra_args: --only-verified --no-update
         continue-on-error: true
-      - name: "Debug TruffleHog results"
-        run: |
-          echo "=== TruffleHog Debug Info ==="
-          echo "Event name: ${{ github.event_name }}"
-          if [ "${{ github.event_name }}" == "pull_request" ]; then
-            echo "Base SHA: ${{ github.event.pull_request.base.sha }}"
-          else
-            echo "Base SHA: ${{ github.event.before }}"
-          fi
-          echo "Head SHA: ${{ github.sha }}"
-          echo "=== End TruffleHog Debug ==="
 
   validate:
     name: "Validate"
