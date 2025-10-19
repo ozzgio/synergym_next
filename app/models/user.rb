@@ -10,4 +10,7 @@ class User < ApplicationRecord
   scope :trainers, -> { where(role: :trainer) }
   scope :athletes, -> { where(role: :athlete) }
   scope :admins, -> { where(role: :admin) }
+
+  # Custom validations (Devise already handles password validation)
+  validates :email, presence: true, uniqueness: { case_insensitive: true }
 end
