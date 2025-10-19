@@ -154,7 +154,7 @@ jobs:
       - name: "Validate commit messages"
         run: |
           git fetch origin main
-          COMMITS=$(git rev-list origin/main..HEAD)
+          COMMITS=$(git rev-list --no-merges origin/main..HEAD)
           for COMMIT in $COMMITS; do
             MESSAGE=$(git log -1 --pretty=format:%s $COMMIT)
             if ! echo "$MESSAGE" | grep -qE "^(feat|fix|docs|style|refactor|perf|test|chore)(\(.+\))?: .{1,50}"; then
