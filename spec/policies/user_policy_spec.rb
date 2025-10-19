@@ -10,48 +10,48 @@ RSpec.describe UserPolicy, type: :policy do
   context 'for an admin' do
     let(:user) { create(:user, :admin) }
 
-    it { is_expected.to permit(:index) }
-    it { is_expected.to permit(:show) }
-    it { is_expected.to permit(:create) }
-    it { is_expected.to permit(:new) }
-    it { is_expected.to permit(:update) }
-    it { is_expected.to permit(:edit) }
-    it { is_expected.to permit(:destroy) }
+    it { expect(subject.index?).to be true }
+    it { expect(subject.show?).to be true }
+    it { expect(subject.create?).to be true }
+    it { expect(subject.new?).to be true }
+    it { expect(subject.update?).to be true }
+    it { expect(subject.edit?).to be true }
+    it { expect(subject.destroy?).to be true }
   end
 
   context 'for a trainer' do
     let(:user) { create(:user, :trainer) }
 
-    it { is_expected.not_to permit(:index) }
-    it { is_expected.not_to permit(:show) }
-    it { is_expected.not_to permit(:create) }
-    it { is_expected.not_to permit(:new) }
-    it { is_expected.not_to permit(:update) }
-    it { is_expected.not_to permit(:edit) }
-    it { is_expected.not_to permit(:destroy) }
+    it { expect(subject.index?).to be false }
+    it { expect(subject.show?).to be false }
+    it { expect(subject.create?).to be false }
+    it { expect(subject.new?).to be false }
+    it { expect(subject.update?).to be false }
+    it { expect(subject.edit?).to be false }
+    it { expect(subject.destroy?).to be false }
   end
 
   context 'for an athlete' do
     let(:user) { create(:user, :athlete) }
 
-    it { is_expected.not_to permit(:index) }
-    it { is_expected.not_to permit(:show) }
-    it { is_expected.not_to permit(:create) }
-    it { is_expected.not_to permit(:new) }
-    it { is_expected.not_to permit(:update) }
-    it { is_expected.not_to permit(:edit) }
-    it { is_expected.not_to permit(:destroy) }
+    it { expect(subject.index?).to be false }
+    it { expect(subject.show?).to be false }
+    it { expect(subject.create?).to be false }
+    it { expect(subject.new?).to be false }
+    it { expect(subject.update?).to be false }
+    it { expect(subject.edit?).to be false }
+    it { expect(subject.destroy?).to be false }
   end
 
   context 'for a guest (not signed in)' do
     let(:user) { nil }
 
-    it { is_expected.not_to permit(:index) }
-    it { is_expected.not_to permit(:show) }
-    it { is_expected.not_to permit(:create) }
-    it { is_expected.not_to permit(:new) }
-    it { is_expected.not_to permit(:update) }
-    it { is_expected.not_to permit(:edit) }
-    it { is_expected.not_to permit(:destroy) }
+    it { expect(subject.index?).to be false }
+    it { expect(subject.show?).to be false }
+    it { expect(subject.create?).to be false }
+    it { expect(subject.new?).to be false }
+    it { expect(subject.update?).to be false }
+    it { expect(subject.edit?).to be false }
+    it { expect(subject.destroy?).to be false }
   end
 end

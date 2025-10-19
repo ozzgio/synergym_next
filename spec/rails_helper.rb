@@ -34,6 +34,9 @@ Shoulda::Matchers.configure do |config|
   end
 end
 
+# Configure pundit matchers
+# Note: pundit-matchers doesn't require additional configuration in recent versions
+
 # Ensures that the test database schema matches the current schema file.
 # If there are pending migrations it will invoke `db:test:prepare` to
 # recreate the test database by loading the schema.
@@ -88,8 +91,7 @@ RSpec.configure do |config|
   config.include Warden::Test::Helpers
 
   # Add Pundit test helpers
-  # Note: Pundit RSpec helpers might require pundit-matchers gem
-  # config.include Pundit::RSpec::Helpers
+  config.include Pundit::Matchers
 
   # Before hook for Warden
   config.before :suite do
