@@ -108,7 +108,7 @@ jobs:
         run: |
           bundle exec brakeman --no-pager --exit-on-warn --format sarif > brakeman-report.sarif
       - name: "Upload Brakeman report"
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: brakeman-report.sarif
         if: false
