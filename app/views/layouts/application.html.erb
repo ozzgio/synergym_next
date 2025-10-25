@@ -11,11 +11,14 @@
     <%= yield :head %>
 
     <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
+    <%= tag.link rel: "manifest", href: asset_path('favicon/site.webmanifest.erb') %>
 
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
+    <%# Favicon for different formats and devices %>
+    <link rel="icon" href="<%= asset_path('favicon/favicon.ico') %>" sizes="any">
+    <link rel="icon" href="<%= asset_path('favicon/favicon.svg') %>" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="<%= asset_path('favicon/favicon_180.png') %>">
+    <link rel="icon" href="<%= asset_path('favicon/favicon_192.png') %>" sizes="192x192" type="image/png">
+    <link rel="icon" href="<%= asset_path('favicon/favicon_512.png') %>" sizes="512x512" type="image/png">
 
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
@@ -23,17 +26,34 @@
   </head>
 
   <body>
+    <%= render 'shared/navigation' %>
+    
     <% if flash.any? %>
-      <div class="flash-messages">
+      <div class="flash-messages fixed top-20 right-4 z-50 space-y-2 max-w-sm" data-controller="flash">
         <% flash.each do |type, message| %>
-          <div class="flash <%= type %>">
-            <%= message %>
+          <%# Determine alert style based on flash type %>
+          <% alert_class = case type.to_sym
+                          when :notice, :success then "bg-green-50 border-green-200 text-green-800"
+                          when :alert, :error then "bg-red-50 border-red-200 text-red-800"
+                          when :warning then "bg-yellow-50 border-yellow-200 text-yellow-800"
+                          else "bg-blue-50 border-blue-200 text-blue-800"
+                          end %>
+          
+          <div class="flash <%= type %> <%= alert_class %> border rounded-md p-4 shadow-sm" data-flash-target="message">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <%# Icon could be added here based on type %>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm font-medium"><%= message %></p>
+              </div>
+            </div>
           </div>
         <% end %>
       </div>
     <% end %>
     
-    <main class="container mx-auto mt-28 px-5 flex">
+    <main class="pt-16">
       <%= yield %>
     </main>
   </body>
