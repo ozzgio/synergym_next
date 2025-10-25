@@ -1,7 +1,29 @@
-<p>Hello <%= @email %>!</p>
+<div class="email-header">
+  <h1>SynergyM</h1>
+  <p>Your Fitness Management Platform</p>
+</div>
 
-<% if @resource.try(:unconfirmed_email?) %>
-  <p>We're contacting you to notify you that your email is being changed to <%= @resource.unconfirmed_email %>.</p>
-<% else %>
-  <p>We're contacting you to notify you that your email has been changed to <%= @resource.email %>.</p>
-<% end %>
+<div class="email-content">
+  <h2 style="color: #1F2937; margin-bottom: 20px;">Email Change Notification</h2>
+  
+  <p style="color: #4B5563; line-height: 1.6; margin-bottom: 20px;">
+    Hello <%= @email %>,
+  </p>
+  
+  <% if @resource.try(:unconfirmed_email?) %>
+    <p style="color: #4B5563; line-height: 1.6; margin-bottom: 20px;">
+      We're contacting you to notify you that your email is being changed to <%= @resource.unconfirmed_email %>.
+    </p>
+    <p style="color: #4B5563; line-height: 1.6; margin-bottom: 20px;">
+      Please confirm your new email address by clicking the link in the confirmation email we just sent you.
+    </p>
+  <% else %>
+    <p style="color: #4B5563; line-height: 1.6; margin-bottom: 20px;">
+      We're contacting you to notify you that your email has been changed to <%= @resource.email %>.
+    </p>
+  <% end %>
+</div>
+
+<div class="email-footer">
+  <p>&copy; <%= Time.now.year %> SynergyM. All rights reserved.</p>
+</div>

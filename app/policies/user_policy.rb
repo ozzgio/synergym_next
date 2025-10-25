@@ -6,15 +6,15 @@ class UserPolicy < ApplicationPolicy
   # https://gist.github.com/Burgestrand/4b4bc22f31c8a95c425fc0e30d7ef1f5
 
   def index?
-    user&.admin? || false
+    admin?
   end
 
   def show?
-    user&.admin? || false
+    admin? || owner?
   end
 
   def create?
-    user&.admin? || false
+    admin?
   end
 
   def new?
@@ -22,7 +22,7 @@ class UserPolicy < ApplicationPolicy
   end
 
   def update?
-    user&.admin? || false
+    admin? || owner?
   end
 
   def edit?
@@ -30,16 +30,17 @@ class UserPolicy < ApplicationPolicy
   end
 
   def destroy?
-    user&.admin? || false
+    admin?
   end
 
   class Scope < ApplicationPolicy::Scope
     # NOTE: Be explicit about which records you allow access to!
     def resolve
-      if user&.admin?
+      if admin?
         scope.all
       else
-        scope.none
+        # Users can only see themselves
+        scope.where(id: user.id)
       end
     end
   end

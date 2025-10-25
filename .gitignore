@@ -12,7 +12,9 @@
 .overcommit.yml
 # Ignore bundler config.
 /.bundle
-
+/node_modules
+/vendor/bundle
+.kilocode/
 # Ignore all environment files.
 /.env*
 
@@ -45,3 +47,4 @@ coverage/
 tmp/
 *.keep
 bin/
+.playwright-mcp

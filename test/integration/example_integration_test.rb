@@ -2,6 +2,6 @@
 class ExampleIntegrationTest < ActionDispatch::IntegrationTest
   test "visiting home page" do
     get root_url
-    assert_select "h1", "Home#index"  # oppure "Welcome" se modifichi la view
+    assert_select "h1", "Transform Your Fitness Journey"
   end
 end

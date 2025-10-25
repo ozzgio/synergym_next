@@ -1,5 +1,25 @@
-<p>Welcome <%= @email %>!</p>
+<div class="email-header">
+  <h1>SynergyM</h1>
+  <p>Your Fitness Management Platform</p>
+</div>
 
-<p>You can confirm your account email through the link below:</p>
+<div class="email-content">
+  <h2 style="color: #1F2937; margin-bottom: 20px;">Welcome to SynergyM!</h2>
+  
+  <p style="color: #4B5563; line-height: 1.6; margin-bottom: 20px;">
+    Welcome <%= @email %>,
+  </p>
+  
+  <p style="color: #4B5563; line-height: 1.6; margin-bottom: 20px;">
+    You can confirm your account email through the button below:
+  </p>
+  
+  <div style="text-align: center; margin: 30px 0;">
+    <%= link_to 'Confirm my account', confirmation_url(@resource, confirmation_token: @token),
+        class: "btn" %>
+  </div>
+</div>
 
-<p><%= link_to 'Confirm my account', confirmation_url(@resource, confirmation_token: @token) %></p>
+<div class="email-footer">
+  <p>&copy; <%= Time.now.year %> SynergyM. All rights reserved.</p>
+</div>

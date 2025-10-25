@@ -24,10 +24,13 @@ Devise.setup do |config|
   # Configure the e-mail address which will be shown in Devise::Mailer,
   # note that it will be overwritten if you use your own mailer class
   # with default "from" parameter.
-  config.mailer_sender = "please-change-me-at-config-initializers-devise@example.com"
+  config.mailer_sender = ENV.fetch("DEVISE_MAILER_SENDER", "no-reply@synergym.com")
 
   # Configure the class responsible to send e-mails.
   # config.mailer = 'Devise::Mailer'
+
+  # Configure the parent class responsible to send e-mails.
+  config.parent_mailer = "ApplicationMailer"
 
   # Configure the parent class responsible to send e-mails.
   # config.parent_mailer = 'ActionMailer::Base'
@@ -129,10 +132,10 @@ Devise.setup do |config|
   # config.pepper = Rails.application.credentials.devise_pepper
 
   # Send a notification to the original email when the user's email is changed.
-  # config.send_email_changed_notification = false
+  config.send_email_changed_notification = true
 
   # Send a notification email when the user's password is changed.
-  # config.send_password_change_notification = false
+  config.send_password_change_notification = true
 
   # ==> Configuration for :confirmable
   # A period that the user is allowed to access the website even without
@@ -271,7 +274,34 @@ Devise.setup do |config|
   # ==> OmniAuth
   # Add a new OmniAuth provider. Check the wiki for more information on setting
   # up on your models and hooks.
-  # config.omniauth :github, 'APP_ID', 'APP_SECRET', scope: 'user,public_repo'
+
+  # ==> OmniAuth
+  # OmniAuth is configured in config/initializers/omniauth.rb
+  # Devise will use the OmniAuth middleware that's already set up there
+  # Use the default Devise path prefix for OmniAuth
+  # config.omniauth_path_prefix = "/users/auth"
+
+  # Configure OmniAuth providers
+  if Rails.application.credentials.google_oauth&.dig(:client_id)
+    config.omniauth :google_oauth2,
+      Rails.application.credentials.google_oauth[:client_id],
+      Rails.application.credentials.google_oauth[:client_secret],
+      {
+        scope: [ "email", "profile" ],
+        prompt: "select_account",
+        image_size: 150,
+        access_type: "online"
+      }
+  end
+
+  if Rails.application.credentials.github_oauth&.dig(:client_id)
+    config.omniauth :github,
+      Rails.application.credentials.github_oauth[:client_id],
+      Rails.application.credentials.github_oauth[:client_secret],
+      {
+        scope: "user,user:email"
+      }
+  end
 
   # ==> Warden configuration
   # If you want to use other strategies, that are not supported by Devise, or
