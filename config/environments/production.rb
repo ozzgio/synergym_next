@@ -67,7 +67,7 @@ Rails.application.configure do
   # Set host to be used by links generated in mailer templates.
   # This should be updated to your actual domain in production
   config.action_mailer.default_url_options = {
-    host: ENV.fetch("APPLICATION_HOST", "example.com"),
+    host: ENV.fetch("APPLICATION_HOST", "synergym.fit"),
     protocol: "https"
   }
 
@@ -80,7 +80,7 @@ Rails.application.configure do
     port: Rails.application.credentials.dig(:smtp, :port) || ENV.fetch("SMTP_PORT", 587),
     authentication: "plain",
     enable_starttls_auto: true,
-    domain: ENV.fetch("APPLICATION_HOST", "herokuapp.com"),
+    domain: ENV.fetch("APPLICATION_HOST", "synergym.fit"),
     openssl_verify_mode: "none" # Use 'none' for self-signed certificates, remove for production
   }
 
@@ -97,10 +97,11 @@ Rails.application.configure do
   # Enable DNS rebinding protection and other `Host` header attacks.
   # Configure allowed hosts for production
   config.hosts = [
-    ENV.fetch("APPLICATION_HOST", "localhost"),  # Allow requests from the configured host
-    /.*\.herokuapp\.com/,                       # Allow all Heroku subdomains
-    "localhost",                                # Allow localhost for health checks
-    "127.0.0.1"                                 # Allow IP address for health checks
+    ENV.fetch("APPLICATION_HOST", "synergym.fit"),  # Allow requests from the configured host
+    "www.synergym.fit",                             # Allow www subdomain
+    /.*\.herokuapp\.com/,                           # Allow all Heroku subdomains
+    "localhost",                                    # Allow localhost for health checks
+    "127.0.0.1"                                     # Allow IP address for health checks
   ]
 
   # Skip DNS rebinding protection for the default health check endpoint.
