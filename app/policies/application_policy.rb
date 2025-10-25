@@ -8,6 +8,7 @@ class ApplicationPolicy
     @record = record
   end
 
+  # Default permissions - override in specific policies as needed
   def index?
     admin?
   end
@@ -36,10 +37,30 @@ class ApplicationPolicy
     admin?
   end
 
+  # Role-based helper methods
   private
 
   def admin?
     user&.admin?
+  end
+
+  def trainer?
+    user&.trainer?
+  end
+
+  def athlete?
+    user&.athlete?
+  end
+
+  # Check if user can access their own record
+  def owner?
+    user == record
+  end
+
+  # Check if user can access record associated with them
+  def associated?
+    # Override in specific policies as needed
+    false
   end
 
   class Scope
@@ -55,5 +76,18 @@ class ApplicationPolicy
     private
 
     attr_reader :user, :scope
+
+    # Helper methods for scopes
+    def admin?
+      user&.admin?
+    end
+
+    def trainer?
+      user&.trainer?
+    end
+
+    def athlete?
+      user&.athlete?
+    end
   end
 end
