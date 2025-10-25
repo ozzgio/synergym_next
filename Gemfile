@@ -27,7 +27,7 @@ gem "omniauth-google-oauth2"
 gem "omniauth-github", "~> 2.0"
 
 # Email delivery
-gem "sendgrid-ruby"
+gem "mailgun-ruby", "~> 1.3"
 
 # Background jobs
 gem "sidekiq"
@@ -87,7 +87,7 @@ group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
 
-  # Preview emails in the browser
+  # Preview emails in the browser for development testing
   gem "letter_opener"
   gem "letter_opener_web", "~> 1.4"
-end
+  end

@@ -71,16 +71,16 @@ Rails.application.configure do
     protocol: "https"
   }
 
-  # Specify outgoing SMTP server. Configure for SendGrid (commonly used with Heroku)
+  # Specify outgoing SMTP server. Configure for Mailgun (budget-friendly option)
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
-    user_name: Rails.application.credentials.dig(:smtp, :user_name) || ENV.fetch("SENDGRID_USERNAME", "apikey"),
-    password: Rails.application.credentials.dig(:smtp, :password) || ENV.fetch("SENDGRID_PASSWORD", nil),
-    address: Rails.application.credentials.dig(:smtp, :address) || ENV.fetch("SMTP_ADDRESS", "smtp.sendgrid.net"),
+    user_name: Rails.application.credentials.dig(:smtp, :user_name) || ENV.fetch("MAILGUN_SMTP_LOGIN", "apikey"),
+    password: Rails.application.credentials.dig(:smtp, :password) || ENV.fetch("MAILGUN_SMTP_PASSWORD", nil),
+    address: Rails.application.credentials.dig(:smtp, :address) || ENV.fetch("MAILGUN_SMTP_SERVER", "smtp.sendgrid.net"),
     port: Rails.application.credentials.dig(:smtp, :port) || ENV.fetch("SMTP_PORT", 587),
     authentication: "plain",
     enable_starttls_auto: true,
-    domain: ENV.fetch("APPLICATION_HOST", "synergym.fit"),
+    domain: ENV.fetch("MAILGUN_DOMAIN", "sandbox6a5b07c9052d4ed5b5f6234598f6150c.mailgun.org"),
     openssl_verify_mode: "none" # Use 'none' for self-signed certificates, remove for production
   }
 
