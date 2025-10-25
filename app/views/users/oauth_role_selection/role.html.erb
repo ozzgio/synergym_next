@@ -1,0 +1,96 @@
+<div class="min-h-screen pt-16 pb-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-gray-100">
+  <div class="max-w-md mx-auto">
+    <!-- Progress indicator -->
+    <div class="mb-8">
+      <div class="flex items-center justify-center gap-2">
+        <div class="flex items-center">
+          <div class="flex h-10 w-10 items-center justify-center rounded-full bg-green-600 text-white font-semibold">
+            1
+          </div>
+          <span class="ml-2 text-sm font-medium text-gray-900">Select Role</span>
+        </div>
+        <div class="h-1 w-8 bg-gray-300"></div>
+        <div class="flex items-center">
+          <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-300 text-gray-600 font-semibold">
+            2
+          </div>
+          <span class="ml-2 text-sm font-medium text-gray-500">Complete Profile</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-lg p-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-2 text-center">Choose Your Role</h2>
+      <p class="text-center text-gray-600 mb-6">Tell us how you want to use Synergym</p>
+      
+      <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-md">
+        <p class="text-sm text-blue-800">
+          <strong>Welcome!</strong> You've successfully authenticated with <strong><%= @provider.humanize %></strong>. 
+          Let's set up your account to get started.
+        </p>
+      </div>
+
+      <% if flash[:alert] %>
+        <div class="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-md">
+          <%= flash[:alert] %>
+        </div>
+      <% end %>
+
+      <%= form_with(url: users_oauth_role_selection_path, method: :post, local: true, class: "space-y-6") do |f| %>
+        <input type="hidden" name="step" value="role">
+        
+        <div class="field space-y-3">
+          <!-- Athlete Option -->
+          <div class="flex items-start p-4 border-2 border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-all cursor-pointer has-[:checked]:border-green-600 has-[:checked]:bg-green-50"
+               onclick="document.getElementById('role_athlete').click()">
+            <div class="flex-shrink-0">
+              <%= radio_button_tag "user[role]", "athlete", true, 
+                  id: "role_athlete",
+                  class: "h-5 w-5 text-green-600 focus:ring-green-500 border-gray-300 mt-0.5" %>
+            </div>
+            <div class="ml-4 flex-grow">
+              <label for="role_athlete" class="block text-sm font-semibold text-gray-900 cursor-pointer">
+                🏋️ Athlete
+              </label>
+              <p class="text-sm text-gray-600 mt-1">Follow personalized training programs and track your progress with expert guidance</p>
+            </div>
+          </div>
+          
+          <!-- Trainer Option -->
+          <div class="flex items-start p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all cursor-pointer has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50"
+               onclick="document.getElementById('role_trainer').click()">
+            <div class="flex-shrink-0">
+              <%= radio_button_tag "user[role]", "trainer", false, 
+                  id: "role_trainer",
+                  class: "h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 mt-0.5" %>
+            </div>
+            <div class="ml-4 flex-grow">
+              <label for="role_trainer" class="block text-sm font-semibold text-gray-900 cursor-pointer">
+                👨‍🏫 Trainer
+              </label>
+              <p class="text-sm text-gray-600 mt-1">Create and manage training programs, coach athletes, and grow your fitness business</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="actions pt-4">
+          <%= f.submit "Continue",
+            class: "w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-semibold text-white bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 ease-in-out" %>
+        </div>
+      <% end %>
+      
+      <div class="mt-6 pt-6 border-t border-gray-200">
+        <div class="text-center">
+          <%= link_to "Cancel and go back", new_user_session_path,
+            class: "text-gray-600 hover:text-gray-700 text-sm font-medium transition duration-150 ease-in-out" %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trust badges -->
+    <div class="mt-8 text-center text-xs text-gray-500 space-y-2">
+      <p>🔒 Your data is secure and encrypted</p>
+      <p>⚡ Setup takes less than 2 minutes</p>
+    </div>
+  </div>
+</div>
