@@ -1,23 +1,53 @@
 {
-    "mcpServers": {
-        "context7": {
-            "command": "npx",
-            "args": [
-                "-y",
-                "@upstash/context7-mcp"
-            ],
-            "env": {
-                "DEFAULT_MINIMUM_TOKENS": ""
-            }
-        },
-        "playwright": {
-            "command": "npx",
-            "args": [
-                "@playwright/mcp"
-            ],
-            "env": {
-                "PLAYWRIGHT_BROWSERS_PATH": "0"
-            }
-        }
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp"
+      ],
+      "env": {
+        "DEFAULT_MINIMUM_TOKENS": ""
+      },
+      "alwaysAllow": [
+        "get-library-docs"
+      ]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp"
+      ],
+      "env": {
+        "PLAYWRIGHT_BROWSERS_PATH": "0"
+      },
+      "alwaysAllow": [
+        "browser_close",
+        "browser_resize",
+        "browser_console_messages",
+        "browser_handle_dialog",
+        "browser_evaluate",
+        "browser_file_upload",
+        "browser_fill_form",
+        "browser_press_key",
+        "browser_install",
+        "browser_navigate",
+        "browser_type",
+        "browser_navigate_back",
+        "browser_network_requests",
+        "browser_take_screenshot",
+        "browser_snapshot",
+        "browser_click",
+        "browser_drag",
+        "browser_hover",
+        "browser_tabs",
+        "browser_select_option",
+        "browser_wait_for",
+        "browser_take_screenshot"
+      ],
+      "disabledTools": [
+        "browser_close"
+      ]
     }
+  }
 }
