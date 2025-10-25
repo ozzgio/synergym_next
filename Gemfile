@@ -21,6 +21,13 @@ gem "jbuilder"
 
 # Authentication
 gem "devise"
+gem "omniauth"
+gem "omniauth-rails_csrf_protection"
+gem "omniauth-google-oauth2"
+gem "omniauth-github", "~> 2.0"
+
+# Email delivery
+gem "sendgrid-ruby"
 
 # Background jobs
 gem "sidekiq"
@@ -79,4 +86,8 @@ end
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
+
+  # Preview emails in the browser
+  gem "letter_opener"
+  gem "letter_opener_web", "~> 1.4"
 end
