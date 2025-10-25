@@ -1,0 +1,10 @@
+# Screenshots and test artifacts
+screenshots/
+test-results/
+playwright-report/
+trace/
+
+# Test outputs
+*.log
+output/
+dist/
